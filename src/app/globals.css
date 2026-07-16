@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+:root {
+  --navy: #031e49;
+  --red: #cd0e17;
+  --gold: #b28706;
+  --offwhite: #f5f5f5;
+  --grey: #dcdcdd;
+
+  --background: var(--navy);
+  --foreground: #ffffff;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-navy: var(--navy);
+  --color-red: var(--red);
+  --color-gold: var(--gold);
+  --color-offwhite: var(--offwhite);
+  --color-brandgrey: var(--grey);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+  /* A faint diamond-stitch "leather" texture tiled across the page, plus a
+     large watermark steering wheel anchored bottom-right. Both are baked
+     at very low opacity directly into the SVGs so they read as texture,
+     not decoration that competes with content. */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='640' viewBox='0 0 640 640'%3E%3Cg fill='none' stroke='%23b28706' stroke-width='3' opacity='0.09'%3E%3Ccircle cx='320' cy='320' r='270'/%3E%3Ccircle cx='320' cy='320' r='240'/%3E%3Ccircle cx='320' cy='320' r='55'/%3E%3Cline x1='320' y1='80' x2='320' y2='270'/%3E%3Cline x1='320' y1='370' x2='140' y2='500'/%3E%3Cline x1='320' y1='370' x2='500' y2='500'/%3E%3C/g%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Cpath d='M0 64 L64 0 M0 0 L64 64' stroke='%23dcdcdd' stroke-width='1.5' stroke-dasharray='3 5' opacity='0.16' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat, repeat;
+  background-position: bottom -60px right -60px, 0 0;
+  background-size: 640px 640px, 64px 64px;
+}
