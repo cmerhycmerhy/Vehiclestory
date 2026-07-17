@@ -353,7 +353,7 @@ export default function EntryForm({
               type="button"
               onClick={handleUnpublish}
               disabled={isUnpublishing}
-              className="rounded-md border border-brandgrey/30 px-4 py-2 text-sm font-semibold text-navy disabled:opacity-50"
+              className="rounded-md border border-brandgrey/30 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
             >
               {isUnpublishing ? "Unpublishing…" : "Unpublish"}
             </button>

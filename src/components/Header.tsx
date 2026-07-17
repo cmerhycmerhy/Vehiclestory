@@ -9,42 +9,47 @@ export default async function Header() {
   } = await supabase.auth.getUser();
 
   return (
-    <header className="flex items-center justify-between border-b border-brandgrey/20 px-6 py-4">
-      <div className="flex items-center gap-6">
-        <Link href="/" className="text-lg font-bold tracking-tight">
+    <header className="flex flex-wrap items-center justify-between gap-y-2 border-b border-brandgrey/20 px-4 py-4 sm:px-6">
+      <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+        <Link href="/" className="whitespace-nowrap text-lg font-bold tracking-tight">
           VehicleStory
         </Link>
         <Link
           href="/browse"
-          className="text-sm font-semibold transition hover:text-gold"
+          className="whitespace-nowrap text-sm font-semibold transition hover:text-gold"
         >
           Browse
         </Link>
       </div>
 
       {user ? (
-        <div className="flex items-center gap-4 text-sm">
-          <Link href="/garage" className="font-semibold transition hover:text-gold">
+        <div className="flex flex-wrap items-center gap-3 text-sm sm:gap-4">
+          <Link
+            href="/garage"
+            className="whitespace-nowrap font-semibold transition hover:text-gold"
+          >
             My garage
           </Link>
-          <span className="text-brandgrey">{user.email}</span>
+          <span className="max-w-[160px] truncate text-brandgrey sm:max-w-none">
+            {user.email}
+          </span>
           <form action={logout}>
             <button
               type="submit"
-              className="rounded-md border border-brandgrey/30 px-3 py-1.5 font-semibold transition hover:bg-white/5"
+              className="whitespace-nowrap rounded-md border border-brandgrey/30 px-3 py-1.5 font-semibold transition hover:bg-white/5"
             >
               Log out
             </button>
           </form>
         </div>
       ) : (
-        <div className="flex items-center gap-3 text-sm">
-          <Link href="/login" className="font-semibold transition hover:text-gold">
+        <div className="flex flex-wrap items-center gap-3 text-sm">
+          <Link href="/login" className="whitespace-nowrap font-semibold transition hover:text-gold">
             Log in
           </Link>
           <Link
             href="/signup"
-            className="rounded-md bg-red px-4 py-1.5 font-semibold text-white transition hover:opacity-90"
+            className="whitespace-nowrap rounded-md bg-red px-4 py-1.5 font-semibold text-white transition hover:opacity-90"
           >
             Sign up
           </Link>
