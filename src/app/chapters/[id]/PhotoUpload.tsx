@@ -135,6 +135,11 @@ export default function PhotoUpload({
         </p>
       </div>
 
+      <p className="text-xs text-brandgrey">
+        Have photos on Instagram? Save the image to your device, then upload
+        it above.
+      </p>
+
       {error && <p className="text-sm text-red">{error}</p>}
 
       {photos.length > 0 && (
