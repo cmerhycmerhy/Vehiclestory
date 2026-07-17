@@ -1,11 +1,21 @@
 import { NextResponse } from "next/server";
 import { decodeVIN } from "@/lib/nhtsa";
 import { createClient } from "@/lib/supabase/server";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ vin: string }> },
 ) {
+  const ip = getClientIp(request);
+  const allowed = await checkRateLimit(`vin-lookup:${ip}`, 20, 60);
+  if (!allowed) {
+    return NextResponse.json(
+      { error: "Too many lookups. Please wait a minute and try again." },
+      { status: 429 },
+    );
+  }
+
   const { vin } = await params;
 
   const decoded = await decodeVIN(vin);

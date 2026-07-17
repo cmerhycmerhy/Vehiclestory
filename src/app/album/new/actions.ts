@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { decodeVIN } from "@/lib/nhtsa";
 import { RELATIONSHIP_TYPE_VALUES } from "@/lib/constants";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export async function createChapter(
   formData: FormData,
@@ -16,6 +17,13 @@ export async function createChapter(
 
   if (!user) {
     redirect("/login");
+  }
+
+  const allowed = await checkRateLimit(`create-chapter:${user.id}`, 10, 3600);
+  if (!allowed) {
+    return {
+      error: "Too many chapters created recently. Please try again later.",
+    };
   }
 
   const vin = (formData.get("vin") as string | null)?.trim().toUpperCase();

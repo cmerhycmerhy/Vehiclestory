@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { RELATIONSHIP_TYPE_VALUES } from "@/lib/constants";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 async function getOwnedChapter(chapterId: string) {
   const supabase = await createClient();
@@ -222,9 +223,14 @@ export async function uploadPhoto(
   chapterId: string,
   formData: FormData,
 ): Promise<{ error: string } | { success: true; photo: UploadedPhoto }> {
-  const { supabase, chapter } = await getOwnedChapter(chapterId);
+  const { supabase, user, chapter } = await getOwnedChapter(chapterId);
   if (!chapter) {
     return { error: "You don't have access to this chapter." };
+  }
+
+  const allowed = await checkRateLimit(`upload-photo:${user.id}`, 60, 3600);
+  if (!allowed) {
+    return { error: "Too many uploads recently. Please try again later." };
   }
 
   const file = formData.get("photo") as File | null;
