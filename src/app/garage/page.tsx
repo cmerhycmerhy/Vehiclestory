@@ -45,30 +45,43 @@ export default async function GaragePage() {
                 : chapter.album_entries;
 
               return (
-                <Link
+                <div
                   key={chapter.id}
-                  href={`/chapters/${chapter.id}`}
-                  className="flex items-center justify-between rounded-lg border border-brandgrey/20 bg-offwhite px-5 py-4 text-navy transition hover:border-gold"
+                  className="flex items-center justify-between gap-4 rounded-lg border border-brandgrey/20 bg-offwhite px-5 py-4 text-navy"
                 >
-                  <div>
-                    <p className="font-bold">
+                  <Link
+                    href={`/chapters/${chapter.id}`}
+                    className="min-w-0 flex-1 transition hover:opacity-80"
+                  >
+                    <p className="truncate font-bold">
                       {entry?.nickname ? `${entry.nickname} — ` : ""}
                       {vehicle?.year} {vehicle?.make} {vehicle?.model}
                     </p>
-                    <p className="text-sm text-brandgrey">
+                    <p className="truncate text-sm text-brandgrey">
                       VIN {vehicle?.vin} ·{" "}
                       {RELATIONSHIP_LABELS[chapter.relationship_type] ??
                         chapter.relationship_type}
                     </p>
+                  </Link>
+
+                  <div className="flex shrink-0 items-center gap-3">
+                    {entry?.is_published && (
+                      <Link
+                        href={`/chapters/${chapter.id}/published`}
+                        className="rounded-md border border-brandgrey/30 px-3 py-1.5 text-xs font-semibold transition hover:bg-navy/5"
+                      >
+                        Share
+                      </Link>
+                    )}
+                    <span
+                      className={`text-xs font-semibold ${
+                        entry?.is_published ? "text-gold" : "text-brandgrey"
+                      }`}
+                    >
+                      {entry?.is_published ? "Published" : "Draft"}
+                    </span>
                   </div>
-                  <span
-                    className={`text-xs font-semibold ${
-                      entry?.is_published ? "text-gold" : "text-brandgrey"
-                    }`}
-                  >
-                    {entry?.is_published ? "Published" : "Draft"}
-                  </span>
-                </Link>
+                </div>
               );
             })}
           </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition, type FormEvent } from "react";
+import Link from "next/link";
 import { saveEntry, publishEntry, unpublishEntry } from "./actions";
 
 type AlbumEntry = {
@@ -349,6 +350,12 @@ export default function EntryForm({
         {isPublished ? (
           <>
             <span className="text-sm font-semibold text-gold">Published</span>
+            <Link
+              href={`/chapters/${chapterId}/published`}
+              className="rounded-md bg-navy px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90"
+            >
+              Share
+            </Link>
             <button
               type="button"
               onClick={handleUnpublish}
