@@ -18,7 +18,7 @@ export default async function Header() {
           href="/browse"
           className="whitespace-nowrap text-sm font-semibold transition hover:text-gold"
         >
-          Browse
+          Discover
         </Link>
       </div>
 

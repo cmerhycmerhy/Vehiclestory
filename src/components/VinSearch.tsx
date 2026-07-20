@@ -60,8 +60,11 @@ export default function VinSearch({ isLoggedIn }: { isLoggedIn: boolean }) {
   return (
     <div className="w-full max-w-xl text-center">
       <h1 className="text-4xl font-bold tracking-tight">VehicleStory</h1>
-      <p className="mt-3 text-brandgrey">
-        Every vehicle has a story. Find yours by VIN.
+      <p className="mx-auto mt-3 max-w-lg text-balance text-brandgrey">
+        VehicleStory turns any car&apos;s VIN into a living biography — every
+        owner, every chapter, every memory, all in one place forever. Enter
+        your VIN and start your chapter, or discover if someone else is
+        already telling your old car&apos;s story.
       </p>
 
       <form onSubmit={handleSubmit} className="mt-8 flex gap-2">
