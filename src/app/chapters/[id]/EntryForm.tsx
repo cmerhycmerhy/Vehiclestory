@@ -235,7 +235,7 @@ export default function EntryForm({
 
         <div>
           <label className="block text-sm font-medium">
-            What you love about it
+            Favorite feature
           </label>
           <textarea
             value={whatILove}

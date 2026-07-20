@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import PhotoGallery from "./PhotoGallery";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
@@ -146,21 +147,13 @@ export default async function PublicAlbumPage({
         <div className="mt-10 flex flex-col gap-10">
           {entries.map((entry) => {
             const entryPhotos = photosByChapter.get(entry.chapter_id) ?? [];
-            const cover = entryPhotos.find((p) => p.is_cover) ?? entryPhotos[0];
 
             return (
               <article
                 key={entry.id}
                 className="rounded-lg border border-brandgrey/20 bg-offwhite p-6 text-navy"
               >
-                {cover && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={cover.public_url}
-                    alt={cover.caption ?? ""}
-                    className="mb-4 h-64 w-full rounded-md object-cover"
-                  />
-                )}
+                <PhotoGallery photos={entryPhotos} />
 
                 {entry.nickname && (
                   <h2 className="text-2xl font-bold">{entry.nickname}</h2>
@@ -172,7 +165,7 @@ export default async function PublicAlbumPage({
 
                 {entry.what_i_love && (
                   <div className="mt-4">
-                    <h3 className="font-semibold text-gold">What they love</h3>
+                    <h3 className="font-semibold text-gold">Favorite Feature</h3>
                     <p className="mt-1 whitespace-pre-wrap">{entry.what_i_love}</p>
                   </div>
                 )}
@@ -210,22 +203,6 @@ export default async function PublicAlbumPage({
                       .filter(Boolean)
                       .join(", ")}
                   </p>
-                )}
-
-                {entryPhotos.length > 1 && (
-                  <div className="mt-4 grid grid-cols-3 gap-2">
-                    {entryPhotos
-                      .filter((p) => p.id !== cover?.id)
-                      .map((photo) => (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          key={photo.id}
-                          src={photo.public_url}
-                          alt={photo.caption ?? ""}
-                          className="h-24 w-full rounded object-cover"
-                        />
-                      ))}
-                  </div>
                 )}
               </article>
             );
