@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState, useTransition } from "react";
-import { useDropzone } from "react-dropzone";
+import { useDropzone, type FileRejection } from "react-dropzone";
 import {
   uploadPhoto,
   deletePhoto,
@@ -51,10 +51,25 @@ export default function PhotoUpload({
     [chapterId, onPhotosChange],
   );
 
+  const onDropRejected = useCallback((rejections: FileRejection[]) => {
+    const messages = rejections.map((rejection) => {
+      const code = rejection.errors[0]?.code;
+      if (code === "file-too-large") {
+        return `${rejection.file.name} is too large (max 10MB)`;
+      }
+      if (code === "file-invalid-type") {
+        return `${rejection.file.name} isn't an image file`;
+      }
+      return `${rejection.file.name} couldn't be uploaded`;
+    });
+    setError(messages.join(". "));
+  }, []);
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: { "image/*": [] },
     maxSize: 10 * 1024 * 1024,
     onDrop,
+    onDropRejected,
   });
 
   async function handleDelete(photoId: string) {
@@ -133,6 +148,7 @@ export default function PhotoUpload({
             ? "Uploading…"
             : "Drag photos here, or click to choose files"}
         </p>
+        <p className="mt-1 text-xs text-brandgrey">Max 10MB per photo</p>
       </div>
 
       <p className="text-xs text-brandgrey">
