@@ -85,6 +85,20 @@ export default function VinSearch({ isLoggedIn }: { isLoggedIn: boolean }) {
         </button>
       </form>
 
+      <p className="mt-3 text-sm text-brandgrey">
+        Don&apos;t have the VIN?{" "}
+        <Link
+          href={
+            isLoggedIn
+              ? "/album/new?manual=1"
+              : `/login?next=${encodeURIComponent("/album/new?manual=1")}`
+          }
+          className="font-semibold text-gold"
+        >
+          Start the story anyway
+        </Link>
+      </p>
+
       {status === "error" && error && <p className="mt-4 text-red">{error}</p>}
 
       {status === "success" && result && (

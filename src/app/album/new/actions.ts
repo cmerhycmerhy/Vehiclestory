@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { decodeVIN } from "@/lib/nhtsa";
+import { buildPlaceholderVin } from "@/lib/placeholder-vin";
 import { RELATIONSHIP_TYPE_VALUES } from "@/lib/constants";
 import { checkRateLimit } from "@/lib/rate-limit";
 
@@ -26,7 +27,11 @@ export async function createChapter(
     };
   }
 
-  const vin = (formData.get("vin") as string | null)?.trim().toUpperCase();
+  const vin =
+    (formData.get("vin") as string | null)?.trim().toUpperCase() || null;
+  const manualYearRaw = (formData.get("year") as string | null)?.trim();
+  const manualMake = (formData.get("make") as string | null)?.trim() || null;
+  const manualModel = (formData.get("model") as string | null)?.trim() || null;
   const relationshipType = formData.get("relationship_type") as string | null;
   const isCurrent = formData.get("is_current") === "true";
   const startedAt = (formData.get("started_at") as string | null) || null;
@@ -40,51 +45,85 @@ export async function createChapter(
   ) as string | null;
   const proofFile = formData.get("proof_document") as File | null;
 
-  if (
-    !vin ||
-    !relationshipType ||
-    !RELATIONSHIP_TYPE_VALUES.has(relationshipType)
-  ) {
+  if (!relationshipType || !RELATIONSHIP_TYPE_VALUES.has(relationshipType)) {
     return { error: "Please fill in the required fields." };
+  }
+
+  if (!vin && !manualMake) {
+    return { error: "Please enter at least the make of the vehicle." };
   }
 
   const admin = createAdminClient();
 
   let vehicle: { id: string } | null = null;
-  const { data: existingVehicle } = await admin
-    .from("vehicles")
-    .select("id")
-    .eq("vin", vin)
-    .maybeSingle();
 
-  if (existingVehicle) {
-    vehicle = existingVehicle;
+  if (vin) {
+    const { data: existingVehicle } = await admin
+      .from("vehicles")
+      .select("id")
+      .eq("vin", vin)
+      .maybeSingle();
+
+    if (existingVehicle) {
+      vehicle = existingVehicle;
+    } else {
+      const decoded = await decodeVIN(vin);
+      if (!decoded.isValid) {
+        return { error: decoded.errorMessage ?? "Could not verify this VIN." };
+      }
+
+      const { data: inserted, error: insertError } = await admin
+        .from("vehicles")
+        .insert({
+          vin: decoded.vin,
+          year: decoded.year,
+          make: decoded.make,
+          model: decoded.model,
+          trim: decoded.trim,
+          body_style: decoded.bodyStyle,
+          engine: decoded.engine,
+          country_of_origin: decoded.countryOfOrigin,
+          nhtsa_data: decoded.rawData,
+        })
+        .select("id")
+        .single();
+
+      if (insertError || !inserted) {
+        return { error: "Could not save this vehicle. Please try again." };
+      }
+      vehicle = inserted;
+    }
   } else {
-    const decoded = await decodeVIN(vin);
-    if (!decoded.isValid) {
-      return { error: decoded.errorMessage ?? "Could not verify this VIN." };
+    const manualYear = manualYearRaw ? parseInt(manualYearRaw, 10) : null;
+
+    for (let attempt = 0; attempt < 5 && !vehicle; attempt++) {
+      const placeholderVin = buildPlaceholderVin(
+        manualYear,
+        manualMake!,
+        manualModel,
+      );
+
+      const { data: inserted, error: insertError } = await admin
+        .from("vehicles")
+        .insert({
+          vin: placeholderVin,
+          year: manualYear,
+          make: manualMake!.toUpperCase(),
+          model: manualModel,
+        })
+        .select("id")
+        .single();
+
+      if (inserted) {
+        vehicle = inserted;
+      } else if (insertError?.code !== "23505") {
+        return { error: "Could not save this vehicle. Please try again." };
+      }
     }
 
-    const { data: inserted, error: insertError } = await admin
-      .from("vehicles")
-      .insert({
-        vin: decoded.vin,
-        year: decoded.year,
-        make: decoded.make,
-        model: decoded.model,
-        trim: decoded.trim,
-        body_style: decoded.bodyStyle,
-        engine: decoded.engine,
-        country_of_origin: decoded.countryOfOrigin,
-        nhtsa_data: decoded.rawData,
-      })
-      .select("id")
-      .single();
-
-    if (insertError || !inserted) {
+    if (!vehicle) {
       return { error: "Could not save this vehicle. Please try again." };
     }
-    vehicle = inserted;
   }
 
   let proofDocumentPath: string | null = null;

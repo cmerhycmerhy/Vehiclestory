@@ -5,7 +5,16 @@ import { useDropzone } from "react-dropzone";
 import { createChapter } from "./actions";
 import { RELATIONSHIP_TYPES, PROOF_DOCUMENT_TYPES } from "@/lib/constants";
 
-export default function ChapterForm({ vin }: { vin: string }) {
+export default function ChapterForm({
+  vin,
+  manual,
+}: {
+  vin?: string;
+  manual?: boolean;
+}) {
+  const [year, setYear] = useState("");
+  const [make, setMake] = useState("");
+  const [model, setModel] = useState("");
   const [relationshipType, setRelationshipType] = useState("current_owner");
   const [isCurrent, setIsCurrent] = useState(true);
   const [startedAt, setStartedAt] = useState("");
@@ -29,8 +38,19 @@ export default function ChapterForm({ vin }: { vin: string }) {
     e.preventDefault();
     setError(null);
 
+    if (manual && !make.trim()) {
+      setError("Please enter at least the make of the vehicle.");
+      return;
+    }
+
     const formData = new FormData();
-    formData.set("vin", vin);
+    if (vin) {
+      formData.set("vin", vin);
+    } else {
+      formData.set("year", year);
+      formData.set("make", make);
+      formData.set("model", model);
+    }
     formData.set("relationship_type", relationshipType);
     formData.set("is_current", isCurrent ? "true" : "false");
     formData.set("started_at", startedAt);
@@ -49,6 +69,39 @@ export default function ChapterForm({ vin }: { vin: string }) {
 
   return (
     <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-5 text-left">
+      {manual && (
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium">Year</label>
+            <input
+              type="number"
+              value={year}
+              onChange={(e) => setYear(e.target.value)}
+              placeholder="1981"
+              className="mt-1 w-full rounded-md border border-brandgrey/30 bg-offwhite px-4 py-2.5 text-navy focus:outline-none focus:ring-2 focus:ring-gold"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium">Make</label>
+            <input
+              value={make}
+              onChange={(e) => setMake(e.target.value)}
+              placeholder="Volkswagen"
+              className="mt-1 w-full rounded-md border border-brandgrey/30 bg-offwhite px-4 py-2.5 text-navy focus:outline-none focus:ring-2 focus:ring-gold"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium">Model</label>
+            <input
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
+              placeholder="Scirocco"
+              className="mt-1 w-full rounded-md border border-brandgrey/30 bg-offwhite px-4 py-2.5 text-navy focus:outline-none focus:ring-2 focus:ring-gold"
+            />
+          </div>
+        </div>
+      )}
+
       <div>
         <label className="block text-sm font-medium">
           Your relationship to this vehicle
