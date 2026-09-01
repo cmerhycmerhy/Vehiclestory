@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import PhotoGallery from "./PhotoGallery";
+import ShareButtons from "@/components/ShareButtons";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
@@ -122,6 +123,12 @@ export default async function PublicAlbumPage({
   }
 
   const name = vehicleName(vehicle);
+  const featuredEntry = entries[0];
+  const featuredChapterPhotos = photosByChapter.get(featuredEntry.chapter_id) ?? [];
+  const featuredCoverPhoto =
+    featuredChapterPhotos.find((p) => p.is_cover) ?? featuredChapterPhotos[0] ?? null;
+  const albumUrl = `${SITE_URL}/album/${vehicle.vin}`;
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Car",
@@ -143,6 +150,20 @@ export default async function PublicAlbumPage({
         <h1 className="text-4xl font-bold tracking-tight">{name}</h1>
         {vehicle.trim && <p className="mt-1 text-brandgrey">{vehicle.trim}</p>}
         <p className="mt-1 text-sm text-brandgrey">VIN {vehicle.vin}</p>
+
+        <div className="mt-8 flex flex-col items-center">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-brandgrey">
+            Share this story
+          </h2>
+          <div className="mt-3">
+            <ShareButtons
+              vehicleName={name}
+              nickname={featuredEntry.nickname}
+              coverPhotoUrl={featuredCoverPhoto?.public_url ?? null}
+              albumUrl={albumUrl}
+            />
+          </div>
+        </div>
 
         <div className="mt-10 flex flex-col gap-10">
           {entries.map((entry) => {
