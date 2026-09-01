@@ -151,20 +151,6 @@ export default async function PublicAlbumPage({
         {vehicle.trim && <p className="mt-1 text-brandgrey">{vehicle.trim}</p>}
         <p className="mt-1 text-sm text-brandgrey">VIN {vehicle.vin}</p>
 
-        <div className="mt-8 flex flex-col items-center">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-brandgrey">
-            Share this story
-          </h2>
-          <div className="mt-3">
-            <ShareButtons
-              vehicleName={name}
-              nickname={featuredEntry.nickname}
-              coverPhotoUrl={featuredCoverPhoto?.public_url ?? null}
-              albumUrl={albumUrl}
-            />
-          </div>
-        </div>
-
         <div className="mt-10 flex flex-col gap-10">
           {entries.map((entry) => {
             const entryPhotos = photosByChapter.get(entry.chapter_id) ?? [];
@@ -228,6 +214,20 @@ export default async function PublicAlbumPage({
               </article>
             );
           })}
+        </div>
+
+        <div className="mt-16 flex flex-col items-center">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-brandgrey">
+            Share this story
+          </h2>
+          <div className="mt-3">
+            <ShareButtons
+              vehicleName={name}
+              nickname={featuredEntry.nickname}
+              coverPhotoUrl={featuredCoverPhoto?.public_url ?? null}
+              albumUrl={albumUrl}
+            />
+          </div>
         </div>
 
         <div className="mt-16 rounded-lg border border-gold/40 bg-offwhite px-6 py-10 text-center text-navy">
